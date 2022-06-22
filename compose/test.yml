@@ -1,0 +1,14 @@
+version: '2.4'
+services:
+
+  exclusive-lock:
+    env_file: ../env/test.env
+    build:
+      context: ../
+      dockerfile: test/Dockerfile
+    volumes:
+      - $PWD/coverage:/opt/app/coverage
+    command: sh -c 'npm run test'
+    depends_on:
+      keydb:
+        condition: service_started
