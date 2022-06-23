@@ -20,8 +20,8 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
 
   const exclusive_lock = new ExclusiveLock({
     name: 'some deployment "name" with spaces'
-  , log
   , cache_connection
+  , log
   , lock_ttl_ms
   , lock_refresh_ms
   })
@@ -86,15 +86,15 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
 
   const instance_1 = new ExclusiveLock({
     name
-  , log
   , cache_connection
+  , log
   , lock_ttl_ms
   , lock_refresh_ms
   })
   const instance_2 = new ExclusiveLock({
     name
-  , log
   , cache_connection
+  , log
   , lock_ttl_ms
   , lock_refresh_ms
   })
@@ -152,8 +152,8 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
 testWithChain(tap, 'If desired, can turn off the refresh timer', async (t, chain) => {
   const exclusive_lock = new ExclusiveLock({
     name: chain.lookup('!random')
-  , log
   , cache_connection: chain.lookup('#cache_connection')
+  , log
   , auto_refresh: false
   })
 
@@ -171,8 +171,8 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
 
   const exclusive_lock = new ExclusiveLock({
     name: chain.lookup('!random')
-  , log
   , cache_connection: chain.lookup('#cache_connection')
+  , log
   , auto_refresh: false
   , lock_contents
   })

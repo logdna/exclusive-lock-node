@@ -66,9 +66,9 @@ main()
 
 ### `new ExclusiveLock(options)`
 * `options` [`<Object>`][]
-  * `name` [`<String>`][] - A unique string to identify your application
-  * `log` [`<Object>`][] - A `pino` logger instance. Must support levels `info`, `warn`, `error`, `debug`
-  * `cache_connection` [`<Object>`][] - A connection to the cache, either Redis or Keydb
+  * `name` [`<String>`][] - **Required** A unique string to identify your application
+  * `cache_connection` [`<Object>`][] - **Required** A connection to the cache, either Redis or Keydb
+  * `log` [`<Object>`][] - A optional logger instance such as `pino`. Must support levels `info`, `warn`, `error`, `debug`. **Default: [abstract-logging](https://www.npmjs.com/package/abstract-logging)**
   * `lock_ttl_ms` [`<Number>`][] - Optional. Specify a TTL in milliseconds for the   lock.  **Default: 3000**
   * `lock_refres_ms` [`<Number>`][] - Optional. specify a time in milliseconds for refreshing the lock on an interval. **Default: 1000**
   * `lock_contents` [`<String>`][] - Optional. Specify the string contents to put in the lock file, e.g. a server/instance name.

@@ -26,25 +26,6 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   t.throws(() => {
     new ExclusiveLock()
   }, {
-    message: 'A pino logger instance is required'
-  , code: 'EINVAL'
-  }, 'No params throws a log error first')
-
-  t.throws(() => {
-    new ExclusiveLock({
-      log: {}
-    })
-  }, {
-    message: 'The logger instance is required to implement levels info, warn, '
-      + 'error, debug'
-  , code: 'ELOGLEVELS'
-  }, 'The required log levels are not supported by the logger instance')
-
-  t.throws(() => {
-    new ExclusiveLock({
-      log
-    })
-  }, {
     message: 'Input validation failed'
   , code: 'EINVAL'
   , errors: [
@@ -56,8 +37,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
-      log
-    , name: 'my-locking-app'
+      name: 'my-locking-app'
     })
   }, {
     message: 'Input validation failed'
@@ -71,8 +51,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
-      log
-    , name: 'my-locking-app'
+      name: 'my-locking-app'
     , cache_connection: {}
     })
   }, {
@@ -83,8 +62,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
-      log
-    , name: 'my-locking-app'
+      name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_ttl_ms: 5000
     })
@@ -100,8 +78,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
-      log
-    , name: 'my-locking-app'
+      name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_refresh_ms: 5000
     })
@@ -117,8 +94,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
-      log
-    , name: 'my-locking-app'
+      name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_ttl_ms: 500
     , lock_refresh_ms: 100
@@ -133,6 +109,16 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
     , diff: 400
     }
   }, 'refresh and ttl must be spaced far enough apart')
+})
+
+testWithChain(tap, 'Providing a log instance works', async (t, chain) => {
+  const exclusive_lock = new ExclusiveLock({
+    name: 'my-locking-app'
+  , cache_connection: chain.lookup('#cache_connection')
+  , log
+  })
+  await t.resolves(exclusive_lock.acquire(), 'Lock acquired')
+  await t.resolves(exclusive_lock.release(), 'Lock released, which makes a log statement')
 })
 
 testWithChain(tap, 'Re-acquiring the same lock is a warning', async (t, chain) => {

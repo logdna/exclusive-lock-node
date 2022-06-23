@@ -22,7 +22,7 @@ module.exports = {
     }
   , log: {
       type: 'object'
-    , description: 'A pino log instance'
+    , description: 'A logger instance such as `pino`. Default is `abstract-logging`.'
     }
   , cache_connection: {
       type: 'object'
@@ -47,7 +47,6 @@ module.exports = {
   }
 , required: [
     'name'
-  , 'log'
   , 'cache_connection'
   ]
 }
