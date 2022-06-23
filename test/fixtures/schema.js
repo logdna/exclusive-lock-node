@@ -44,6 +44,10 @@ module.exports = {
       type: 'boolean'
     , description: 'Automatically set up refreshing on a timed interval. Default is `true`'
     }
+  , key_prefix: {
+      type: 'string'
+    , description: 'Optional key prefix for the lock. Default is "exclusive-lock".'
+    }
   }
 , required: [
     'name'

@@ -13,7 +13,7 @@ const {
 
 setup()
 
-testWithChain(tap, 'Successful lock', async (t, chain) => {
+testWithChain(tap, 'Successful lock with default key_prefix', async (t, chain) => {
   const cache_connection = chain.lookup('#cache_connection')
   const lock_ttl_ms = 600
   const lock_refresh_ms = 50
@@ -28,7 +28,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
 
   t.equal(
     exclusive_lock.key,
-    'lock-manager:some-deployment-name-with-spaces'
+    'exclusive-lock:some-deployment-name-with-spaces'
   , 'The key was slugified'
   )
 
@@ -76,6 +76,17 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   , null
   , 'The lock file was removed'
   )
+})
+
+testWithChain(tap, 'Specifying key_prefix uses it in the lock name', async (t, chain) => {
+  const name = chain.lookup('!random')
+  const exclusive_lock = new ExclusiveLock({
+    name
+  , cache_connection: chain.lookup('#cache_connection')
+  , key_prefix: 'my-special-key   with  spaces'
+  })
+
+  t.equal(exclusive_lock.key, `my-special-key-with-spaces:${name}`, 'key name is correct')
 })
 
 testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) => {
