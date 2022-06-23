@@ -197,4 +197,17 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   t.same(result, lock_contents, 'String contents was correct')
 })
 
+testWithChain(tap, 'toString() returns our class\'s name', async (t, chain) => {
+  const exclusive_lock = new ExclusiveLock({
+    name: chain.lookup('!random')
+  , cache_connection: chain.lookup('#cache_connection')
+  })
+
+  t.equal(
+    exclusive_lock.toString()
+  , '[object ExclusiveLock]'
+  , '.toString() returned the class name'
+  )
+})
+
 teardown()
