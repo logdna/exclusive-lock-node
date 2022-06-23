@@ -4,12 +4,17 @@
   - [NOTES](#notes)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Auto-refreshing](#auto-refreshing)
 - [API](#api)
   - [`new ExclusiveLock(options)`](#new-exclusivelockoptions)
   - [`acquire()`](#acquire)
   - [`inspect()`](#inspect)
   - [`release()`](#release)
-  - [`refresh()`](#refresh)
+- [Events](#events)
+  - [`'acquired'`](#acquired)
+  - [`'refreshed'`](#refreshed)
+  - [`'released'`](#released)
+  - [`'error'`](#error)
 - [Authors](#authors)
 - [License](#license)
 - [Contributing](#contributing)
@@ -60,6 +65,16 @@ async function main() {
 main()
 ```
 
+## Auto-refreshing
+As a feature, `exclusive-lock` will start a timer to automatically refresh the TTL on
+the lock file, as it's assumed that the lock holder will always want to hold the lock
+until explicitly released. This feature is handled by a `setInterval` timer and can
+encouter errors asynchronously.  See the [`error`](#error) event for details on that.
+
+* The timer is not started until a lock is successfully [`acquired`](#acquire).
+* For clean shutdown, always [`release()`](#release) an acquired lock so that the timer is canceled.
+* [`refreshed`](#refreshed) is emitted for every successful refresh.
+
 ## API
 
 -------
@@ -72,8 +87,6 @@ main()
   * `lock_ttl_ms` [`<Number>`][] - Optional. Specify a TTL in milliseconds for the   lock.  **Default: 3000**
   * `lock_refres_ms` [`<Number>`][] - Optional. specify a time in milliseconds for refreshing the lock on an interval. **Default: 1000**
   * `lock_contents` [`<String>`][] - Optional. Specify the string contents to put in the lock file, e.g. a server/instance name.
-  * `auto_refresh` [`<Boolean>`][] - When `true`, it automatically refreshes the lock TTL on an interval, every `lock_refresh_ms`.
-    When `false`, it is up to the user to call `refresh()` if desired. **Default: true**
 
   Throws: [`<Error>`][] for validation errors
 
@@ -82,7 +95,8 @@ main()
 Attempts to exclusively acquire a lock based on the given `name`. If multiple
 instances are competing, only 1 will win the lock.
 
-Returns: `Promise<Boolean>` if the lock was a success
+Returns: `Promise<Boolean>` if the lock was a success \
+Emits: [`acquired`](#acquired)
 
 ### `inspect()`
 
@@ -96,11 +110,47 @@ Returns: `Promise<Object|Number|Boolean|String>` The contents of the lock
 Unlock based on `name`.  Idempotent.  Instances that do not have the lock will
 be a no-op.
 
-Returns: `Promise<undefined>`
+Returns: `Promise<undefined>` \
+Emits: [`released`](#released)
 
-### `refresh()`
+## Events
 
-This refreshes the lock's TTL and can be repeatedly run to ensure that the TTL on the lock doesn't prematurely expire. There is no need to manually run this unless `auto_refresh` has been manually set to `false`. It is also idempotent.
+### `'acquired'`
+
+* `key` [`<String>`][] - The key value of the lock stored in cache
+
+This event is emitted after a successful lock is acquired. Because the [`acquire()`](#acquire)
+method is `async`, there's no real need to listen for this, but it has been added
+to remain consistent with the [`'released'`](#released) event which can happen asynchronously.
+
+### `'refreshed'`
+
+* [`<Object>`][] - The payload object
+  * `key` [`<String>`][] - The key value of the lock stored in cache
+  * `lock_ttl_ms` [`<Number>`][] - The TTL value that it was refreshed to
+
+This event is emitted after a lock's TTL is successfully refreshed.
+
+### `'released'`
+
+* `key` [`<String>`][] - The key value of the lock stored in cache
+
+This event is emitted when a lock is released.
+
+### `'error'`
+
+* `err` [`<Error>`][] - A thrown error that occurred
+
+This event is thrown when errors are encountered in the TTL refresh timer. In this
+case, the error is emitted and the following actions are taken:
+
+* [`release()`](#release) will automatically be called. This is so that the lock does
+  not become expired leaving the lock holder thinking that it's still acquired. Users
+  should listen for these events and act accordingly.
+* If the above `release()` also fails, an `'error'` event will be emitted again with
+  those details. At that point, the instance will no longer think the lock is acquired, but its record will remain until the TTL expires. This is because the failure in `release()` will be because of a failed `cache.del()` operation, thus
+  leaving the key.
+
 ## Authors
 
 * [**Darin Spivey**](mailto:darin.spivey@mezmo.com) &lt;darin.spivey@mezmo.com&gt;

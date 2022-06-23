@@ -32,7 +32,21 @@ testWithChain(tap, 'Successful lock with default key_prefix', async (t, chain) =
   , 'The key was slugified'
   )
 
+  const acquired_evt = t.eventPromise(exclusive_lock, 'acquired', [
+    exclusive_lock.key
+  ], 'Got the acquired event')
+
+  const refreshed_evt = t.eventPromise(exclusive_lock, 'refreshed', [
+    {
+      key: exclusive_lock.key
+    , lock_ttl_ms
+    }
+  ], 'Got the refreshed event')
+
   await t.resolves(exclusive_lock.acquire(), 'Got a lock')
+
+  await acquired_evt
+  await refreshed_evt
 
   const multi = cache_connection
     .multi()
@@ -67,7 +81,12 @@ testWithChain(tap, 'Successful lock with default key_prefix', async (t, chain) =
   , lock_refresh_ms
   })
 
+  const released_evt = t.eventPromise(exclusive_lock, 'released', [
+    exclusive_lock.key
+  ], 'Got the released event')
+
   await t.resolves(exclusive_lock.release(), 'Unlocked')
+  await released_evt
 
   t.equal(exclusive_lock.acquired, false, 'acquired was reset')
   t.equal(exclusive_lock.refresh_timer, null, 'refresh_timer was killed')
@@ -158,23 +177,6 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
     t.equal(unlocked_instance.acquired, false, 'acquired is still false')
     t.equal(unlocked_instance.refresh_timer, null, 'refresh_timer is still null')
   })
-})
-
-testWithChain(tap, 'If desired, can turn off the refresh timer', async (t, chain) => {
-  const exclusive_lock = new ExclusiveLock({
-    name: chain.lookup('!random')
-  , cache_connection: chain.lookup('#cache_connection')
-  , log
-  , auto_refresh: false
-  })
-
-  t.teardown(async () => {
-    await exclusive_lock.release()
-  })
-
-  await t.resolves(exclusive_lock.acquire(), 'Got the lock')
-
-  t.equal(exclusive_lock.refresh_timer, null, 'A timer was NOT set')
 })
 
 testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {

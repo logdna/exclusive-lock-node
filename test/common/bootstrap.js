@@ -1,5 +1,6 @@
 'use strict'
 
+const {isDeepStrictEqual} = require('util')
 const tap = require('tap')
 
 if (require.main === module) {
@@ -17,6 +18,33 @@ module.exports = {
 , testWithChain
 , ExclusiveLock
 }
+
+// This custom assertion handles creating a promise with `on` so that it can be used
+// with `waitForPromise`. Doing this ensures good labels for when things fail as opposed
+// to errors without context
+tap.Test.prototype.addAssert('eventPromise', 3, function(...args) {
+  const [emitter, event_name, payload = [], orig_message, extra] = args
+  const message = orig_message + ` (${JSON.stringify(payload)})`
+
+  const promise = new Promise((resolve) => {
+    const listener_symbol = Symbol('eventPromise')
+    // Trick to assign a symbol as a function name while still using arrow functions
+    const fns = {
+      [listener_symbol]: (...evt) => {
+        evt.length = payload.length
+        if (isDeepStrictEqual(evt, payload)) {
+          emitter.removeListener(event_name, fns[listener_symbol])
+          return resolve(payload)
+        }
+        this.comment(`${
+          event_name
+        } event did not match expected payload ${payload} (got ${evt})`)
+      }
+    }
+    emitter.on(event_name, fns[listener_symbol])
+  })
+  return this.resolveMatch(promise, payload, message, extra)
+})
 
 function setup(fn) {
   return tap.test('setup', async (t) => {
