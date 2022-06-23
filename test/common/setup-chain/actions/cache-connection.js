@@ -4,7 +4,7 @@
 // one test can bleed into another test
 
 const Redis = require('ioredis')
-const log = require('../../log.js').child({module: 'keydb-connection'})
+const log = require('../../log.js').child({module: 'cache-connection'})
 const CACHE_HOST = process.env.CACHE_HOST
 
 module.exports = async function cacheConnection(opts) {
