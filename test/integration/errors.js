@@ -32,6 +32,16 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 
   t.throws(() => {
     new ExclusiveLock({
+      log: {}
+    })
+  }, {
+    message: 'The logger instance is required to implement levels info, warn, '
+      + 'error, debug'
+  , code: 'ELOGLEVELS'
+  }, 'The required log levels are not supported by the logger instance')
+
+  t.throws(() => {
+    new ExclusiveLock({
       log
     })
   }, {
