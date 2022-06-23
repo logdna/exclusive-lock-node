@@ -52,7 +52,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   , lock_ttl_ms
   })
 
-  t.equal(exclusive_lock.got_lock, true, 'got_lock is set')
+  t.equal(exclusive_lock.acquired, true, 'acquired is set')
   t.equal(exclusive_lock.lock_ttl_ms, lock_ttl_ms, 'lock_ttl_ms was saved')
   t.equal(exclusive_lock.lock_refresh_ms, lock_refresh_ms, 'lock_refresh_ms was saved')
   t.ok(exclusive_lock.refresh_timer, 'A refresh timer is started')
@@ -69,7 +69,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
 
   await t.resolves(exclusive_lock.release(), 'Unlocked')
 
-  t.equal(exclusive_lock.got_lock, false, 'got_lock was reset')
+  t.equal(exclusive_lock.acquired, false, 'acquired was reset')
   t.equal(exclusive_lock.refresh_timer, null, 'refresh_timer was killed')
   t.same(
     await cache_connection.get(exclusive_lock.lock_name)
@@ -104,20 +104,20 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
   , instance_2.acquire()
   ]), 'Both instances try and get a lock at the same time')
 
-  if (instance_1.got_lock && instance_2.got_lock) {
+  if (instance_1.acquired && instance_2.acquired) {
     t.fail('Only 1 instance should have gotten the lock')
   }
-  if (!instance_1.got_lock && !instance_2.got_lock) {
+  if (!instance_1.acquired && !instance_2.acquired) {
     t.fail('Neither instance got a lock...why?')
   }
   t.ok(
-    instance_1.got_lock || instance_2.got_lock
+    instance_1.acquired || instance_2.acquired
   , 'One instance got the lock'
   )
 
   let locked_instance
   let unlocked_instance
-  if (instance_1.got_lock) {
+  if (instance_1.acquired) {
     locked_instance = instance_1
     unlocked_instance = instance_2
   } else {
@@ -138,13 +138,13 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
   t.test('The locked instance cleans up properly on stop()', async (t) => {
     await t.resolves(locked_instance.release(), 'Unlock success')
 
-    t.equal(locked_instance.got_lock, false, 'got_lock was cleaned up')
+    t.equal(locked_instance.acquired, false, 'acquired was cleaned up')
     t.equal(locked_instance.refresh_timer, null, 'refresh_timer was stopped')
   })
   t.test('The instance without a lock cleans up properly on stop()', async (t) => {
     await t.resolves(unlocked_instance.release(), 'Unlock success')
 
-    t.equal(unlocked_instance.got_lock, false, 'got_lock is still false')
+    t.equal(unlocked_instance.acquired, false, 'acquired is still false')
     t.equal(unlocked_instance.refresh_timer, null, 'refresh_timer is still null')
   })
 })

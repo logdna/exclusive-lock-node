@@ -50,8 +50,8 @@ const exclusive_lock = new ExclusiveLock({
 })
 
 async function main() {
-  const got_lock = await exclusive_lock.acquire()
-  if (got_lock) {
+  const acquired = await exclusive_lock.acquire()
+  if (acquired) {
     log.info('You win the race! Lock acquired')
   }
   exclusive_lock.release()

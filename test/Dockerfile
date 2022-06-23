@@ -1,4 +1,4 @@
-FROM us.gcr.io/logdna-k8s/node:14-ci as base
+FROM node:14 as base
 
 USER root
 RUN mkdir -p /opt/app/coverage

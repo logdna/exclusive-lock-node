@@ -235,7 +235,7 @@ testWithChain(tap, 'Errors are handled in release()', async (t, chain) => {
 
   await t.resolves(exclusive_lock.acquire(), 'Got a lock')
   await t.resolves(exclusive_lock.release(), 'Released worked despite the error')
-  t.equal(exclusive_lock.got_lock, false, 'got_lock was reset')
+  t.equal(exclusive_lock.acquired, false, 'acquired was reset')
 })
 
 teardown()
