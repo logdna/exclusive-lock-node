@@ -71,8 +71,7 @@ main()
   * `cache_connection` [`<Object>`][] - A connection to the cache, either Redis or Keydb
   * `lock_ttl_ms` [`<Number>`][] - Optional. Specify a TTL in milliseconds for the   lock.  **Default: 3000**
   * `lock_refres_ms` [`<Number>`][] - Optional. specify a time in milliseconds for refreshing the lock on an interval. **Default: 1000**
-  * `lock_contents` [`<Object>`][]|[`<Number>`][] |[`<Boolean>`][] |[`<String>`][] -
-    Optional. Specify the contents to put in the lock file, e.g. a server/instance name.
+  * `lock_contents` [`<String>`][] - Optional. Specify the string contents to put in the lock file, e.g. a server/instance name.
   * `auto_refresh` [`<Boolean>`][] - When `true`, it automatically refreshes the lock TTL on an interval, every `lock_refresh_ms`.
     When `false`, it is up to the user to call `refresh()` if desired. **Default: true**
 

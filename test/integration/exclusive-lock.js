@@ -167,79 +167,23 @@ testWithChain(tap, 'If desired, can turn off the refresh timer', async (t, chain
 })
 
 testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
-  const cache_connection = chain.lookup('#cache_connection')
+  const lock_contents = 'some sort of meta information here'
 
-  t.afterEach(async () => {
-    await t.context.exclusive_lock.release()
+  const exclusive_lock = new ExclusiveLock({
+    name: chain.lookup('!random')
+  , log
+  , cache_connection: chain.lookup('#cache_connection')
+  , auto_refresh: false
+  , lock_contents
   })
 
-  t.test('Contents can be a number', async (t) => {
-    const lock_contents = 12345
-    const exclusive_lock = new ExclusiveLock({
-      name: chain.lookup('!random')
-    , log
-    , cache_connection
-    , auto_refresh: false
-    , lock_contents
-    })
-
-    t.parent.context.exclusive_lock = exclusive_lock
-
-    await exclusive_lock.acquire()
-    const result = await exclusive_lock.inspect()
-    t.same(result, lock_contents, 'Numeric contents was correct')
+  t.teardown(async () => {
+    await exclusive_lock.release()
   })
 
-  t.test('Contents can be an object', async (t) => {
-    const lock_contents = {pod_name: 'abc123', my_date: new Date()}
-    const exclusive_lock = new ExclusiveLock({
-      name: chain.lookup('!random')
-    , log
-    , cache_connection
-    , auto_refresh: false
-    , lock_contents
-    })
-
-    t.parent.context.exclusive_lock = exclusive_lock
-
-    await exclusive_lock.acquire()
-    const result = await exclusive_lock.inspect()
-    t.same(result, lock_contents, 'Object contents was correct')
-  })
-
-  t.test('Contents can be a boolean', async (t) => {
-    const lock_contents = true
-    const exclusive_lock = new ExclusiveLock({
-      name: chain.lookup('!random')
-    , log
-    , cache_connection
-    , auto_refresh: false
-    , lock_contents
-    })
-
-    t.parent.context.exclusive_lock = exclusive_lock
-
-    await exclusive_lock.acquire()
-    const result = await exclusive_lock.inspect()
-    t.same(result, lock_contents, 'Boolean contents was correct')
-  })
-
-  t.test('Contents can be a string', async (t) => {
-    const lock_contents = 'some sort of meta information here'
-    const exclusive_lock = new ExclusiveLock({
-      name: chain.lookup('!random')
-    , log
-    , cache_connection
-    , auto_refresh: false
-    , lock_contents
-    })
-
-    t.parent.context.exclusive_lock = exclusive_lock
-
-    await exclusive_lock.acquire()
-    const result = await exclusive_lock.inspect()
-    t.same(result, lock_contents, 'String contents was correct')
-  })
+  await exclusive_lock.acquire()
+  const result = await exclusive_lock.inspect()
+  t.same(result, lock_contents, 'String contents was correct')
 })
 
 teardown()

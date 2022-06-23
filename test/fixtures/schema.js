@@ -37,21 +37,8 @@ module.exports = {
     , description: 'Optionally specify a time in milliseconds for refreshing the lock. Default is 1000'
     }
   , lock_contents: {
-      oneOf: [
-        {
-          type: 'object'
-        }
-      , {
-          type: 'number'
-        }
-      , {
-          type: 'boolean'
-        }
-      , {
-          type: 'string'
-        }
-      ]
-    , description: 'Optionally specify the contents of the lock file. Default is 1.'
+      type: 'string'
+    , description: 'Optionally specify the contents of the lock file. Default is "1".'
     }
   , auto_refresh: {
       type: 'boolean'
