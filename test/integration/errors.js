@@ -171,7 +171,7 @@ testWithChain(tap, 'Inspect noops and errors', async (t, chain) => {
     await t.resolves(exclusive_lock.acquire(), 'Got the lock')
     // Corrupt the file
     const bad_contents = '{"nope": '
-    await exclusive_lock.cache_connection.set(exclusive_lock.lock_name, bad_contents)
+    await exclusive_lock.cache_connection.set(exclusive_lock.key, bad_contents)
     const result = await exclusive_lock.inspect()
     t.same(result, bad_contents, 'The raw contents were returned')
   })
@@ -216,7 +216,7 @@ testWithChain(tap, 'refresh() noops and errors', async (t, chain) => {
     exclusive_lock.refresh()
     t.same(exclusive_lock.is_refreshing, true, 'is_refreshing is true')
     await chain.sleep({ms: 200}).execute()
-    const pttl = await cache_connection.pttl(exclusive_lock.lock_name)
+    const pttl = await cache_connection.pttl(exclusive_lock.key)
     t.ok(pttl <= 400, 'The TTL was not reset', {pttl})
     t.equal(exclusive_lock.is_refreshing, false, 'is_refreshing was reset even on error')
   })

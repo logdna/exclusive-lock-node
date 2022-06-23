@@ -27,17 +27,17 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   })
 
   t.equal(
-    exclusive_lock.lock_name,
+    exclusive_lock.key,
     'lock-manager:some-deployment-name-with-spaces'
-  , 'The lock_name was slugified'
+  , 'The key was slugified'
   )
 
   await t.resolves(exclusive_lock.acquire(), 'Got a lock')
 
   const multi = cache_connection
     .multi()
-    .get(exclusive_lock.lock_name)
-    .pttl(exclusive_lock.lock_name)
+    .get(exclusive_lock.key)
+    .pttl(exclusive_lock.key)
 
   const [
     [, contents]
@@ -58,7 +58,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   t.ok(exclusive_lock.refresh_timer, 'A refresh timer is started')
 
   await chain.sleep({ms: 200}).execute()
-  const refreshed_ttl = await cache_connection.pttl(exclusive_lock.lock_name)
+  const refreshed_ttl = await cache_connection.pttl(exclusive_lock.key)
   const refreshed_diff = lock_ttl_ms - ttl
   t.ok(ttl_diff <= 100, 'The TTL has been refreshed via a timer', {
     refreshed_diff
@@ -72,7 +72,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   t.equal(exclusive_lock.acquired, false, 'acquired was reset')
   t.equal(exclusive_lock.refresh_timer, null, 'refresh_timer was killed')
   t.same(
-    await cache_connection.get(exclusive_lock.lock_name)
+    await cache_connection.get(exclusive_lock.key)
   , null
   , 'The lock file was removed'
   )
