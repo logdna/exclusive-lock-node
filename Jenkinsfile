@@ -6,7 +6,12 @@ def DEFAULT_BRANCH = 'main'
 def TRIGGER_PATTERN = ".*@logdnabot.*"
 
 pipeline {
-  agent {label 'ec2-fleet'}
+  agent {
+    node {
+      label 'ec2-fleet'
+      customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
+    }
+  }
 
   options {
     timestamps()
@@ -43,13 +48,6 @@ pipeline {
         beforeAgent true
         not {
           changelog '\\[skip ci\\]'
-        }
-      }
-
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
         }
       }
 
@@ -105,13 +103,6 @@ pipeline {
         }
       }
 
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
-        }
-      }
-
       tools {
         nodejs 'NodeJS 14'
       }
@@ -138,13 +129,6 @@ pipeline {
         branch DEFAULT_BRANCH
         not {
           changelog '\\[skip ci\\]'
-        }
-      }
-
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
         }
       }
 
