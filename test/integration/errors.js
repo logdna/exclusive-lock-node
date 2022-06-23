@@ -49,15 +49,15 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   , code: 'EINVAL'
   , errors: [
       {
-        message: "must have required property 'app_name'"
+        message: "must have required property 'name'"
       }
     ]
-  }, 'app_name is required')
+  }, 'name is required')
 
   t.throws(() => {
     new ExclusiveLock({
       log
-    , app_name: 'my-locking-app'
+    , name: 'my-locking-app'
     })
   }, {
     message: 'Input validation failed'
@@ -72,7 +72,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   t.throws(() => {
     new ExclusiveLock({
       log
-    , app_name: 'my-locking-app'
+    , name: 'my-locking-app'
     , cache_connection: {}
     })
   }, {
@@ -84,7 +84,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   t.throws(() => {
     new ExclusiveLock({
       log
-    , app_name: 'my-locking-app'
+    , name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_ttl_ms: 5000
     })
@@ -101,7 +101,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   t.throws(() => {
     new ExclusiveLock({
       log
-    , app_name: 'my-locking-app'
+    , name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_refresh_ms: 5000
     })
@@ -118,7 +118,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
   t.throws(() => {
     new ExclusiveLock({
       log
-    , app_name: 'my-locking-app'
+    , name: 'my-locking-app'
     , cache_connection: chain.lookup('#cache_connection')
     , lock_ttl_ms: 500
     , lock_refresh_ms: 100
@@ -138,7 +138,7 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
 testWithChain(tap, 'Re-acquiring the same lock is a warning', async (t, chain) => {
   const exclusive_lock = new ExclusiveLock({
     log
-  , app_name: chain.lookup('!random')
+  , name: chain.lookup('!random')
   , cache_connection: chain.lookup('#cache_connection')
   })
 
@@ -155,7 +155,7 @@ testWithChain(tap, 'Re-acquiring the same lock is a warning', async (t, chain) =
 testWithChain(tap, 'Inspect noops and errors', async (t, chain) => {
   const exclusive_lock = new ExclusiveLock({
     log
-  , app_name: chain.lookup('!random')
+  , name: chain.lookup('!random')
   , cache_connection: chain.lookup('#cache_connection')
   })
 
@@ -181,7 +181,7 @@ testWithChain(tap, 'refresh() noops and errors', async (t, chain) => {
   const cache_connection = chain.lookup('#cache_connection')
   const exclusive_lock = new ExclusiveLock({
     log
-  , app_name: chain.lookup('!random')
+  , name: chain.lookup('!random')
   , cache_connection
   , lock_ttl_ms: 600
   , lock_refresh_ms: 100
@@ -226,7 +226,7 @@ testWithChain(tap, 'Errors are handled in release()', async (t, chain) => {
   const cache_connection = chain.lookup('#cache_connection')
   const exclusive_lock = new ExclusiveLock({
     log
-  , app_name: chain.lookup('!random')
+  , name: chain.lookup('!random')
   , cache_connection
   , lock_ttl_ms: 600
   , lock_refresh_ms: 100

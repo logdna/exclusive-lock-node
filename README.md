@@ -44,7 +44,7 @@ const cache_connection = require('./my-keydb-connection.js')
 const pino = require('pino')
 
 const exclusive_lock = new ExclusiveLock({
-  app_name: 'my-distributed-app'
+  name: 'my-distributed-app'
 , log: pino()
 , cache_manager
 })
@@ -66,7 +66,7 @@ main()
 
 ### `new ExclusiveLock(options)`
 * `options` [`<Object>`][]
-  * `app_name` [`<String>`][] - A unique string to identify your application
+  * `name` [`<String>`][] - A unique string to identify your application
   * `log` [`<Object>`][] - A `pino` logger instance. Must support levels `info`, `warn`, `error`, `debug`
   * `cache_connection` [`<Object>`][] - A connection to the cache, either Redis or Keydb
   * `lock_ttl_ms` [`<Number>`][] - Optional. Specify a TTL in milliseconds for the   lock.  **Default: 3000**
@@ -80,7 +80,7 @@ main()
 
 ### `acquire()`
 
-Attempts to exclusively acquire a lock based on the given `app_name`. If multiple
+Attempts to exclusively acquire a lock based on the given `name`. If multiple
 instances are competing, only 1 will win the lock.
 
 Returns: `Promise<Boolean>` if the lock was a success
@@ -94,7 +94,7 @@ Returns: `Promise<Object|Number|Boolean|String>` The contents of the lock
 
 ### `release()`
 
-Unlock based on `app_name`.  Idempotent.  Instances that do not have the lock will
+Unlock based on `name`.  Idempotent.  Instances that do not have the lock will
 be a no-op.
 
 Returns: `Promise<undefined>`

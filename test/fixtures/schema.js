@@ -15,7 +15,7 @@ module.exports = {
     ]
   }
 , properties: {
-    app_name: {
+    name: {
       type: 'string'
     , minLength: 1
     , description: "The app name to be used in the lock's name"
@@ -59,7 +59,7 @@ module.exports = {
     }
   }
 , required: [
-    'app_name'
+    'name'
   , 'log'
   , 'cache_connection'
   ]

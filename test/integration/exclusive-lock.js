@@ -19,7 +19,7 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
   const lock_refresh_ms = 50
 
   const exclusive_lock = new ExclusiveLock({
-    app_name: 'some deployment "name" with spaces'
+    name: 'some deployment "name" with spaces'
   , log
   , cache_connection
   , lock_ttl_ms
@@ -79,20 +79,20 @@ testWithChain(tap, 'Successful lock', async (t, chain) => {
 })
 
 testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) => {
-  const app_name = chain.lookup('!random')
+  const name = chain.lookup('!random')
   const cache_connection = chain.lookup('#cache_connection')
   const lock_ttl_ms = 600
   const lock_refresh_ms = 50
 
   const instance_1 = new ExclusiveLock({
-    app_name
+    name
   , log
   , cache_connection
   , lock_ttl_ms
   , lock_refresh_ms
   })
   const instance_2 = new ExclusiveLock({
-    app_name
+    name
   , log
   , cache_connection
   , lock_ttl_ms
@@ -151,7 +151,7 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
 
 testWithChain(tap, 'If desired, can turn off the refresh timer', async (t, chain) => {
   const exclusive_lock = new ExclusiveLock({
-    app_name: chain.lookup('!random')
+    name: chain.lookup('!random')
   , log
   , cache_connection: chain.lookup('#cache_connection')
   , auto_refresh: false
@@ -176,7 +176,7 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   t.test('Contents can be a number', async (t) => {
     const lock_contents = 12345
     const exclusive_lock = new ExclusiveLock({
-      app_name: chain.lookup('!random')
+      name: chain.lookup('!random')
     , log
     , cache_connection
     , auto_refresh: false
@@ -193,7 +193,7 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   t.test('Contents can be an object', async (t) => {
     const lock_contents = {pod_name: 'abc123', my_date: new Date()}
     const exclusive_lock = new ExclusiveLock({
-      app_name: chain.lookup('!random')
+      name: chain.lookup('!random')
     , log
     , cache_connection
     , auto_refresh: false
@@ -210,7 +210,7 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   t.test('Contents can be a boolean', async (t) => {
     const lock_contents = true
     const exclusive_lock = new ExclusiveLock({
-      app_name: chain.lookup('!random')
+      name: chain.lookup('!random')
     , log
     , cache_connection
     , auto_refresh: false
@@ -227,7 +227,7 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   t.test('Contents can be a string', async (t) => {
     const lock_contents = 'some sort of meta information here'
     const exclusive_lock = new ExclusiveLock({
-      app_name: chain.lookup('!random')
+      name: chain.lookup('!random')
     , log
     , cache_connection
     , auto_refresh: false
