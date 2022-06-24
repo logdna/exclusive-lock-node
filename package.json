@@ -1,0 +1,108 @@
+{
+  "name": "exclusive-lock",
+  "description": "Create atomic locks that can be used in a distributed environment",
+  "version": "0.0.0",
+  "main": "index.js",
+  "files": [
+    "lib/**",
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "tap": "tap",
+    "lint": "eslint ./",
+    "lint:fix": "npm run lint -- --fix",
+    "local": "env $(cat env/local.env) ",
+    "commitlint": "commitlint --from=origin/main --to=HEAD",
+    "release": "semantic-release",
+    "release:dry": "semantic-release --dry-run --no-ci --branches ${BRANCH_NAME:-main}",
+    "pretest": "npm run lint && npm run commitlint",
+    "test": "tools/test-ci.sh",
+    "test:ci": "docker-compose -f compose/base.yml -f compose/test.yml up --always-recreate-deps --force-recreate --remove-orphans --build --abort-on-container-exit",
+    "start": "docker-compose -f compose/base.yml -f compose/dev.yml up",
+    "stop": "docker-compose -f compose/base.yml -f compose/dev.yml down --remove-orphans"
+  },
+  "author": "Darin Spivey <darin.spivey@mezmo.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/logdna/exclusive-lock-node"
+  },
+  "homepage": "https://github.com/logdna/exclusive-lock-node",
+  "bugs": {
+    "url": "https://github.com/logdna/exclusive-lock-node/issues"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "publishConfig": {
+    "access": "public"
+  },
+  "commitlint": {
+    "extends": [
+      "@logdna/commitlint-config"
+    ]
+  },
+  "private": false,
+  "release": {
+    "extends": "semantic-release-config-logdna",
+    "branches": [
+      "main"
+    ]
+  },
+  "eslintConfig": {
+    "root": true,
+    "ignorePatterns": [
+      "node_modules/",
+      "coverage/"
+    ],
+    "extends": "logdna",
+    "parserOptions": {
+      "ecmaVersion": 13
+    }
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=14"
+  },
+  "tap": {
+    "100": true,
+    "ts": false,
+    "jsx": false,
+    "browser": false,
+    "check-coverage": true,
+    "output-file": ".tap-output",
+    "files": [
+      "test/unit",
+      "test/integration"
+    ],
+    "coverage-report": [
+      "text",
+      "text-summary",
+      "json",
+      "json-summary",
+      "html"
+    ],
+    "nyc-arg": [
+      "--all",
+      "--exclude=test/",
+      "--exclude=coverage/"
+    ]
+  },
+  "devDependencies": {
+    "@logdna/commitlint-config": "^2.0.0",
+    "@logdna/setup-chain": "^1.0.13",
+    "commitlint": "^17.0.2",
+    "eslint": "^8.18.0",
+    "eslint-config-logdna": "^6.1.0",
+    "ioredis": "^5.0.6",
+    "pino": "^8.1.0",
+    "pino-pretty": "^8.1.0",
+    "semantic-release": "^19.0.3",
+    "semantic-release-config-logdna": "^1.3.0",
+    "tap": "^16.3.0"
+  },
+  "dependencies": {
+    "abstract-logging": "^2.0.1",
+    "ajv": "^8.11.0",
+    "fluent-json-schema": "^3.1.0"
+  }
+}
