@@ -1,7 +1,7 @@
 {
   "name": "exclusive-lock",
   "description": "Create atomic locks that can be used in a distributed environment",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "index.js",
   "files": [
     "lib/**",
