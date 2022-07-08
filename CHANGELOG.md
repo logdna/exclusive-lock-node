@@ -1,5 +1,12 @@
 ## Changelog
 
+## [1.0.1](https://github.com/logdna/exclusive-lock-node/compare/v1.0.0...v1.0.1) (2022-07-08)
+
+
+### Bug Fixes
+
+* `debug` log level for `refresh()` is too noisy [90fa0a3](https://github.com/logdna/exclusive-lock-node/commit/90fa0a32436ef1e7c30f7790ead314b715c5f2c0) - Darin Spivey, closes: [#4](https://github.com/logdna/exclusive-lock-node/issues/4)
+
 # 1.0.0 (2022-06-24)
 
 
