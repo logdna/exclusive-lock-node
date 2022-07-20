@@ -179,6 +179,45 @@ testWithChain(tap, 'Only 1 competing resource gets the lock', async (t, chain) =
   })
 })
 
+testWithChain(tap, 'Inspect returns TTL and lock contents', async (t, chain) => {
+  const exclusive_lock = new ExclusiveLock({
+    name: chain.lookup('!random')
+  , cache_connection: chain.lookup('#cache_connection')
+  , log
+  , auto_refresh: false
+  })
+
+  // Manually set to prove that you don't need `acquire`
+  const lock_ttl_ms = 10000 // 10 seconds, just for testing
+  await exclusive_lock.cache_connection.set(
+    exclusive_lock.key
+  , exclusive_lock.lock_contents
+  , 'PX'
+  , lock_ttl_ms
+  )
+  const result = await exclusive_lock.inspect()
+  t.equal(result.lock_contents, '1', 'contents were returned')
+  t.ok(result.lock_ttl_ms, 'TTL was returned')
+  const delta = lock_ttl_ms - result.lock_ttl_ms
+  t.ok(delta <= 500, 'TTL value is within an acceptable threshold', {
+    result: result.lock_ttl_ms
+  , lock_ttl_ms
+  , delta
+  })
+})
+
+testWithChain(tap, 'Inspect results if there is no lock file', async (t, chain) => {
+  const exclusive_lock = new ExclusiveLock({
+    name: chain.lookup('!random')
+  , cache_connection: chain.lookup('#cache_connection')
+  , log
+  , auto_refresh: false
+  })
+
+  const result = await exclusive_lock.inspect()
+  t.equal(result, null, 'A null result indicates there is no lock')
+})
+
 testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
   const lock_contents = 'some sort of meta information here'
 
@@ -196,7 +235,7 @@ testWithChain(tap, 'The lock contents can be specified', async (t, chain) => {
 
   await exclusive_lock.acquire()
   const result = await exclusive_lock.inspect()
-  t.same(result, lock_contents, 'String contents was correct')
+  t.same(result.lock_contents, lock_contents, 'String contents was correct')
 })
 
 testWithChain(tap, 'toString() returns our class\'s name', async (t, chain) => {

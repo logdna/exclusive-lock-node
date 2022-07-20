@@ -71,7 +71,6 @@
     "check-coverage": true,
     "output-file": ".tap-output",
     "files": [
-      "test/unit",
       "test/integration"
     ],
     "coverage-report": [

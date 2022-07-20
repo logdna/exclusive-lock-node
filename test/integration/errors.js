@@ -109,6 +109,23 @@ testWithChain(tap, 'Instantiation errors', async (t, chain) => {
     , diff: 400
     }
   }, 'refresh and ttl must be spaced far enough apart')
+
+  t.throws(() => {
+    new ExclusiveLock({
+      name: 'my-locking-app'
+    , cache_connection: chain.lookup('#cache_connection')
+    , lock_contents: null
+    })
+  }, {
+    message: 'Input validation failed'
+  , code: 'EINVAL'
+  , errors: [
+      {
+        instancePath: '/lock_contents'
+      , message: 'must be string'
+      }
+    ]
+  }, 'throws if lock_contents is null')
 })
 
 testWithChain(tap, 'Providing a log instance works', async (t, chain) => {
@@ -136,17 +153,6 @@ testWithChain(tap, 'Re-acquiring the same lock is a warning', async (t, chain) =
 
   const result = await exclusive_lock.acquire()
   t.equal(result, true, 'Lock is already required')
-})
-
-testWithChain(tap, 'Inspecting an unlocked instance is a noop', async (t, chain) => {
-  const exclusive_lock = new ExclusiveLock({
-    log
-  , name: chain.lookup('!random')
-  , cache_connection: chain.lookup('#cache_connection')
-  })
-
-  const result = await exclusive_lock.inspect()
-  t.same(result, undefined, 'Nothing to inspect because there is no lock')
 })
 
 testWithChain(
@@ -279,6 +285,85 @@ testWithChain(tap, 'release() throws errors', async (t, chain) => {
   await t.resolves(exclusive_lock.acquire(), 'Got a lock')
   await t.rejects(exclusive_lock.release(), err, 'Expected error is thrown')
   t.equal(exclusive_lock.acquired, false, 'acquired was reset despite the error')
+})
+
+testWithChain(tap, 'inspect handles errors', async (t, chain) => {
+  const cache_connection = chain.lookup('#cache_connection')
+  const exclusive_lock = new ExclusiveLock({
+    log
+  , name: chain.lookup('!random')
+  , cache_connection
+  })
+
+  t.teardown(async () => {
+    await exclusive_lock.release()
+  })
+  // Create it
+  await t.resolves(exclusive_lock.acquire(), 'lock acquired')
+
+  t.test('Handles an error with the .get command in the pipeline', async (t) => {
+    const multiCmd = cache_connection.multi
+    cache_connection.multi = function() {
+      const multi = multiCmd.call(cache_connection)
+      multi.exec = async function() {
+        return [
+          [new Error('BOOM! Fake GET error')]
+        ]
+      }
+      return multi
+    }
+
+    t.teardown(() => {
+      cache_connection.multi = multiCmd
+    })
+
+    await t.rejects(exclusive_lock.inspect(), {
+      message: 'BOOM! Fake GET error'
+    }, 'Expected error is thrown')
+  })
+
+  t.test('Handles an error with the .pttl command in the pipeline', async (t) => {
+    const multiCmd = cache_connection.multi
+    cache_connection.multi = function() {
+      const multi = multiCmd.call(cache_connection)
+      multi.exec = async function() {
+        return [
+          null
+        , [new Error('BOOM! FAKE error in the TTL command')]
+        ]
+      }
+      return multi
+    }
+
+    t.teardown(() => {
+      cache_connection.multi = multiCmd
+    })
+
+    await t.rejects(exclusive_lock.inspect(), {
+      message: 'BOOM! FAKE error in the TTL command'
+    }, 'Expected error is thrown')
+  })
+
+  t.test('Handles when the pipeline returns a nullish result', async (t) => {
+    const multiCmd = cache_connection.multi
+    cache_connection.multi = function() {
+      const multi = multiCmd.call(cache_connection)
+      multi.exec = async function() {
+        return null
+      }
+      return multi
+    }
+
+    t.teardown(() => {
+      cache_connection.multi = multiCmd
+    })
+
+    const result = await exclusive_lock.inspect()
+    t.same(result, {
+      lock_ttl_ms: undefined
+    , lock_contents: undefined
+    }, 'Result was correct')
+  })
 })
 
 teardown()

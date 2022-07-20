@@ -88,30 +88,33 @@ encouter errors asynchronously.  See the [`error`](#error) event for details on 
   * `lock_refres_ms` [`<Number>`][] - Optional. specify a time in milliseconds for refreshing the lock on an interval. **Default: 1000**
   * `lock_contents` [`<String>`][] - Optional. Specify the string contents to put in the lock file, e.g. a server/instance name.
 
-  Throws: [`<Error>`][] for validation errors
+  *Throws*: [`<Error>`][] for validation errors
 
 ### `acquire()`
 
 Attempts to exclusively acquire a lock based on the given `name`. If multiple
 instances are competing, only 1 will win the lock.
 
-Returns: `Promise<Boolean>` if the lock was a success \
-Emits: [`acquired`](#acquired)
+*Returns*: `Promise<Boolean>` if the lock was a success \
+*Emits*: [`acquired`](#acquired)
 
 ### `inspect()`
 
-Returns the contents of the lock. Useful if `lock_contents` was used to store
-valuable information in the lock.
+Returns an object containing the remaining TTL (if any) on the lock, and the serialized lock contents. Useful if `lock_contents` was used to store
+valuable information in the lock, or to analyze the TTL. Any client can inspect
+the lock regardless of who acquired it.
 
-Returns: `Promise<Object|Number|Boolean|String>` The contents of the lock
+**If there is no lock, `null` is returned**
 
+*Returns*: `Promise<Object<lock_ttl_ms: Number, lock_contents: Object|Number|Boolean|String>>` An object containing the remaining TTL (in milliseconds), plus the contents of the lock \
+*Throws*: [`<Error>`][] for cache store `pipeline` errors
 ### `release()`
 
 Unlock based on `name`.  Idempotent.  Instances that do not have the lock will
 be a no-op.
 
-Returns: `Promise<undefined>` \
-Emits: [`released`](#released)
+*Returns*: `Promise<undefined>` \
+*Emits*: [`released`](#released)
 
 ## Events
 
