@@ -1,5 +1,19 @@
 ## Changelog
 
+# [2.0.0](https://github.com/logdna/exclusive-lock-node/compare/v1.0.1...v2.0.0) (2022-07-25)
+
+
+### Chores
+
+* **lib**: Change the return value for `inspect` [7363db7](https://github.com/logdna/exclusive-lock-node/commit/7363db772ed120977c4e6d53622615313bb4bcc0) - Darin Spivey, closes: [#6](https://github.com/logdna/exclusive-lock-node/issues/6)
+
+
+### **BREAKING CHANGES**
+
+* **lib:** The function now returns a staic object with
+properties for TTL and contents
+* **lib:** `acquire` is no longer required to `inspect`
+
 ## [1.0.1](https://github.com/logdna/exclusive-lock-node/compare/v1.0.0...v1.0.1) (2022-07-08)
 
 
