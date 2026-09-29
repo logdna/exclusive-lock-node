@@ -1,4 +1,4 @@
-FROM node:14 as base
+FROM node:24 AS base
 
 USER root
 RUN mkdir -p /opt/app/coverage
@@ -7,8 +7,8 @@ WORKDIR /opt/app
 USER 1000
 VOLUME /opt/app/coverage
 
-COPY ./package.json /opt/app/
+COPY --chown=1000:1000 ./package.json /opt/app/
 
 RUN npm install
 
-COPY . /opt/app
+COPY --chown=1000:1000 . /opt/app

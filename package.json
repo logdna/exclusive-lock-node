@@ -61,7 +61,7 @@
   },
   "engineStrict": true,
   "engines": {
-    "node": ">=14"
+    "node": ">=24"
   },
   "tap": {
     "100": true,
