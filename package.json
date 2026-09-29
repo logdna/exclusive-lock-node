@@ -102,6 +102,6 @@
   "dependencies": {
     "abstract-logging": "^2.0.1",
     "ajv": "^8.11.0",
-    "fluent-json-schema": "^3.1.0"
+    "fluent-json-schema": "^6.0.1"
   }
 }
