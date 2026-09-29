@@ -1,5 +1,22 @@
 ## Changelog
 
+# [3.0.0](https://github.com/logdna/exclusive-lock-node/compare/v2.0.0...v3.0.0) (2026-09-29)
+
+
+### Bug Fixes
+
+* **deps**: Upgrade fluent-json-schema@6.0.1 [83e572b](https://github.com/logdna/exclusive-lock-node/commit/83e572b9a1f92dbaafd10b716f4434c599c0f31c) - Darin Spivey, closes: [#12](https://github.com/logdna/exclusive-lock-node/issues/12)
+
+
+### Chores
+
+* **pkg**: Require node 24 [954e47f](https://github.com/logdna/exclusive-lock-node/commit/954e47f70d52cbcedcd13f1b3585ae7a80c237ef) - Darin Spivey, closes: [#12](https://github.com/logdna/exclusive-lock-node/issues/12)
+
+
+### **BREAKING CHANGES**
+
+* **pkg:** The minimum supported node version is now 24.
+
 # [2.0.0](https://github.com/logdna/exclusive-lock-node/compare/v1.0.1...v2.0.0) (2022-07-25)
 
 
