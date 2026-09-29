@@ -104,7 +104,7 @@ pipeline {
       }
 
       tools {
-        nodejs 'NodeJS 14'
+        nodejs 'NodeJS 24'
       }
 
       environment {
@@ -133,7 +133,7 @@ pipeline {
       }
 
       tools {
-        nodejs 'NodeJS 14'
+        nodejs 'NodeJS 24'
       }
 
       environment {
